@@ -2,6 +2,72 @@ import Image from 'next/image'
 
 export default function Home() {
   return (
+    <>
+      <header>
+        <h1>Minecraft のこと、ゲームだと思ってない？</h1>
+        <p>それだけじゃ勿体ない！</p>
+        <p>デザイン、プログラムとしてのMinecraftを知ろう！</p>
+      </header>
+      <main>
+        <section>
+          <h1>『Minecraft』って？</h1>
+          <figure>
+            <blockquote>
+              Minecraft（マインクラフト）は、Mojang Studiosが開発した3次元サンドボックス型のゲームで、プレイヤーはブロックやエンティティで構成された3次元の環境を自由に操作してプレイすることができます。その多様なゲーム性は、プレイヤーが遊び方を選ぶことができ、無数の可能性を秘めています。
+            </blockquote>
+            <figcaption>
+              <cite><a href='https://minecraft.fandom.com/ja/wiki/Minecraft_Wiki'>Minecraft Wiki</a></cite>より引用
+            </figcaption>
+          </figure>
+          <p>
+            Minecraftはその独特な世界観と自由度の高さから圧倒的な人気を持つゲームです。
+            サバイバルモードで冒険をして、拠点を建てて、色んなことをする...
+            <u>Minecraftはゲームとしても立派に楽しむことができます。</u>
+          </p>
+        </section>
+        <section>
+          <h1>でも、もっとクリエイティブに</h1>
+          <p>
+            サバイバルモードをした後、他のこともしてみたくてクリエイティブモードをすることがあるかもしれません。
+            資材が限られていないこのモードでは、建築やレッドストーンといったサバイバルモードでは難しいような、高度なことも簡単にできるようにします。
+            これらの高度な要素は、実際にMinecraftで建築をするための企業が興されるほどに、奥深くもあります。
+          </p>
+        </section>
+        <section>
+          <h1>プログラムへの第一歩</h1>
+          <p>
+            クリエイティブモードをするうちに、『コマンド』に触れることがあるかもしれません。
+            ”/”から始まって、英単語を空白で挟んで並べていくのは、まさに英語のようで覚えるのが大変かもしれません。
+            しかし、<u>コマンドを実行したことで、五感でわかりやすい効果を得られることは、覚える上でとても役に立ちます</u>。
+            調べながらでも、自分で書くことができれば、もしかしたらそれは立派な『プログラム』かもしれません。
+            実際、<u>スプリクト言語で書くコードは文字数は少なく、実行することに重きを置いている面において、似た点を持っています</u>。
+          </p>
+        </section>
+        <section>
+          <h1>ならば、ここから</h1>
+          <p>
+            コマンドから派生して出来ることは沢山あります。
+          </p>
+        </section>
+        <section>
+          <h1>「Modを作りたい」は憧れまでで</h1>
+          <p>
+            Minecraftをやり尽くす勢いで遊ぶなら、Modをすることもあるかもしれません。
+            「Mod」はMinecraftのプログラムを書き換えて、オリジナルの要素を追加するコンテンツです。
+            これまでのMinecraftにないような独自の機能の数々は、きっと虜にするでしょう。
+            そして、やっていくうちに、こういうことをやってみたいから発展して、「作ってみたい」となった時、大抵は挫折します。
+            情報量が少ない上に、あっても英語、古すぎて今は使えない。ということが殆どなので、完成まで行くことは難しいです。
+          </p>
+        </section>
+      </main>
+      <footer>
+
+      </footer>
+    </>
+  )
+}
+
+/*
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
         <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
@@ -109,5 +175,4 @@ export default function Home() {
         </a>
       </div>
     </main>
-  )
-}
+*/
