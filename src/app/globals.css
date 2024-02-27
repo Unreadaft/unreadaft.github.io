@@ -3,25 +3,23 @@
 @tailwind utilities;
 
 :root {
-  --foreground: #fff;
-  --background: #88ccee;
+  --foreground: whitesmoke;
+  --background: black;
   --highlight: #16a34a;
   font-size: large;
 }
 
 body {
+  height: 100vh;
+  width: 100vw;
   color: var(--foreground);
   background: var(--background);
   overscroll-behavior: none;
 }
 
-a, em {
-  text-decoration: underline var(--highlight) 2px;
-}
-
-a:hover {
-  color: var(--highlight);
-}
+/* .cover {
+  box-shadow: inset 0 0 5em 1em black;
+} */
 
 h1 {
   padding: 1rem/* 16px */;
@@ -30,8 +28,15 @@ h1 {
   font-weight: 700;
 }
 
-footer p, footer a {
-  font-size: 0.875rem/* 14px */;
-  line-height: 1.25rem/* 20px */;
-  color: #9ca3af;
+p {
+  padding: 0.5em 0;
+}
+
+a, em {
+  font-style: unset;
+  text-decoration: underline var(--highlight) 2px;
+}
+
+a:hover {
+  color: var(--highlight);
 }

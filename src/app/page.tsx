@@ -1,154 +1,161 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
-import { motion, useScroll } from 'framer-motion'
-import { Canvas, useThree, useFrame } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+import { Canvas, useFrame } from '@react-three/fiber'
+import { Gltf, Scroll, ScrollControls, useScroll } from '@react-three/drei'
+import { PropsWithChildren, Suspense, useRef, useState } from 'react'
+import { Object3D } from 'three'
 
-const Cave = () => {
-  let index = 0
-  const { scene } = useGLTF('/cave.glb', true)
-  const { scrollY } = useScroll()
+const source = {
+  logo: '/resource/minecraft-logo.png',
+  cave: '/resource/cave.gltf',
+  diorite: '/resource/diorite.gltf',
+} as const
 
-  useThree(({ camera }) => void camera.position.setZ(13))
-  useFrame(({ camera }) => {
-    if (window !== void 0) camera.position.setY(-10 - scrollY.get() / window.innerHeight * 9)
-  })
-  useEffect(() => scrollY.on('change', latest => {
-    if (latest > index * screen.height) scrollTo({ top: ++index * screen.height - 1, behavior: 'smooth' })
-  }), [scrollY])
-
-  return (<primitive object={scene}/>)
-}
-
-const Page = ({children}: {children: React.ReactNode}) => (
-  <>
-    <div className='fixed top-0 -z-10 h-screen w-screen' style={{minWidth: '310px'}}>
-      <Canvas camera={{fov: 90}}>
-        <directionalLight castShadow position={[0, 1, -10]} intensity={5} color={0x88ccee}/>
-        <ambientLight intensity={3} color={0x88ccee}/>
-        <Cave/>
+export default function Home() {
+  return (
+    <main className='h-screen w-screen'>
+      <Canvas shadows>
+        {/* <PerspectiveCamera makeDefault>
+          <Html className='cover absolute z-10 h-screen w-screen pointer-events-none'/>
+        </PerspectiveCamera> */}
+        <ambientLight color='#aaccdd' intensity={1} />
+        <rectAreaLight color='#aaccdd' intensity={50} position={[3, 40, 0]} rotation={[Math.PI / -2, 0, 0]} />
+        <Fire/>
+        <fog attach='fog' color='#000' near={28} far={39} />
+        <ScrollControls pages={4.2} damping={0}>
+          <Content />
+          <Suspense fallback="だめぽ"><Gltf src={source.cave} matrixAutoUpdate={false}/></Suspense>
+          <BuildingDiorite range={[0.2, 0.23]} position={[[-1, -0.49], [7, 8.7], [8, 1.16]]} rotation={[[3, 3], [1, 1, Math.PI], [2, 2]]}/>
+          <BuildingDiorite range={[0.23, 0.26]} position={[[-2, 0.51], [2, 4.7], [3, -3.84]]} rotation={[[2, 2], [1, 1, Math.PI], [1, 1]]}/>
+        </ScrollControls>
       </Canvas>
-    </div>
-    <main className='flex flex-col gap-4' style={{minWidth: '310px'}}>{children}</main>
-  </>
-)
-
-const Title = () => {
-  const [ width, setWidth ] = useState(0)
-  useEffect(() => {
-    const onResize = () => setWidth(window.innerWidth)
-    if (window !== void 0) {
-      setWidth(window.innerWidth)
-      window.addEventListener('resize', onResize)
-      return window.removeEventListener('resize', onResize)
-    }
-  }, [])
-
-  return width > 1000 ? (
-    <h1 className='flex gap-2 self-center'>
-      <img src='/minecraft-logo.png' alt='Minecraft' className='max-w-md'/>
-      <span className='text-4xl whitespace-nowrap font-bold'>のこと、<br/>ゲームだと思ってない？</span>
-    </h1>
-  ) : (
-    <h1 className='flex flex-col items-center self-center'>
-      <img src='/minecraft-logo.png' alt='Minecraft'/><br/>
-      <span className='text-4xl font-bold'>のこと、ゲームだと思ってない？</span>
-    </h1>
+    </main>
   )
 }
 
-const Section = ({isHead = false, children}: {isHead?: boolean, children: React.ReactNode[]}) => (
-  <section className={`flex flex-col justify-center h-screen ${isHead ? '' : 'px-4 md:px-40'}`}>
-    <div className={`flex flex-col justify-center p-4 ${
-      isHead ? 'items-center text-xl' : 'bg-green-900/50'
-    }`}>{
-      children.map((node, index) => (
-        <motion.span key={`${node?.toString()}${index}`} initial={{
-          opacity: 0,
-          transitionProperty: 'all',
-          transitionDelay: `${index}s`,
-          transitionDuration: '1s'
-        }} whileInView={{opacity: 1}} viewport={{ once: true, amount: 0 }}>{node}</motion.span>
-      ))
-    }</div>
-  </section>
-)
+function Content() {
+  const scroll = useScroll()
+  
+  useFrame(({ camera }) => {
+    camera.position.set(-2, -scroll.range(0, 1) * 31 + 13, 14)
 
-const Figure = ({site, href, children}: {site: string, href: string} & React.PropsWithChildren) => (
-  <figure className='flex flex-col mx-10 items-center'>
-    <blockquote className='p-4 bg-green-950'>{children}</blockquote>
-    <figcaption className='p-4 rounded-xl self-end'>
-      ー <cite><a href={href}>{site}</a> から引用</cite>
-    </figcaption>
-  </figure>
-)
-
-export default function Home() {
-  useEffect(() => {
-    if (window !== void 0) window.scrollTo({ top: 0, behavior: 'instant' })
-  }, [])
+    const visible = scroll.range(0, 70 / 100) * 35 + 65
+    document.body.style.background = `linear-gradient(0deg, #000 0%, #000 ${visible}%, #88ccee ${visible}%, #88ccee 100%)`
+  })
 
   return (
-    <>
-      <Page>
-        <Section isHead>
-          <Title/>
-          <p className='font-bold'>実は、それだけじゃない！</p>
-          <p className='font-bold'>デザイン、プログラムの勉強にも Minecraft は使えます！</p>
-        </Section>
-        <Section>
-          <h1>『Minecraft』って？</h1>
-          <Figure site='Minecraft' href='https://www.minecraft.net/ja-jp/minecraft-tips-for-beginners'>
-            Minecraft は、ブロック、モブ、コミュニティで出来ているゲームです。夜を生き抜いたり、芸術作品を作ったり。遊び方はあなた次第です。
-          </Figure>
-          <p>
-            Minecraftはその独特な世界観と自由度の高さから圧倒的な人気を持つゲームです。<br/>
-            勿論ですが、<em>Minecraft はゲームとしても立派に楽しむことができます。</em><br/>
-            サバイバルモードで冒険をして、採掘をして、拠点を建てて…
-          </p>
-        </Section>
-        <Section>
-          <h1>始まりの一歩</h1>
-          <p>
-            クリエイティブモードでは建材は無制限。
-            建物を建てるのもよし、レッドストーン回路を組み立てるもよしです。
-            <br/>
-            建築 は奥深く、四角いお家から、過剰なほどの装飾で出来た巨大な都市を作ってしまうこともできます。<br/>
-            レッドストーン回路 はお家の玄関に置く感圧板から、Minecraft の世界で Minecraft を作ってしまうこともできます。<br/>
-            コマンド は / から始まる不思議な英単語の羅列で出来ていて、新しい要素を作ってしまうこともできます。<br/>
-            プラグイン や モッド は コマンド よりも更に自由度が高く、もはや Minecraft とは言い難いようなものまで作ってしまうこともできます。<br/>
-            リソースパック はアイテムの見た目を変えるところから、Minecraft を脱却したような立体感のあるものを作ってしまうこともできます。
-          </p>
-        </Section>
-        <Section>
-          <h1 className='p-4 text-2xl font-bold'>上を見てはキリがない</h1>
-          <p>
-            …とはいえ、上の世界を見て、自分がそこまで行けるのかという疑問も確かです。<br/>
-            <br/>
-            <em>百聞は一見に如かず、やってみましょう！</em><br/>
-            <br/>
-            当コミュニティでは、Minecraft の基礎的なことから、応用した様々な技術についての情報を提供するべく活動しています！<br/>
-            ご興味がありましたら、これが授業の一環でしかなく、実現はしずらいことをご理解いただいたうえで、<br/>
-            コミュニティのことは一旦諦めて、まずはあなたが気になることから調べてみましょう！
-          </p>
-        </Section>
-      </Page>
-      <footer className='flex flex-col items-center p-4 border-t-2 border-t-green-800 bg-green-950'>
-        <p>
-          このサイトは
-          <a href='https://www.minecraft.net/ja-jp/usage-guidelines'>Minecraft 利用ガイドライン</a>
-          に沿って作成されています。
-        </p>
-        <p>
-          また、このサイトはMinecraft公式サイトではなく、Mojang Studios 及び Microsoft に関係するものでもありません。
-        </p>
-        <p className='py-4'>
-          問い合わせは
-          <a href='https://n-highschool.slack.com/team/U01TQ4M0L1L'>Unreadabread</a>
-          まで
-        </p>
+    <Scroll html>
+      <Section ishead>
+        <h1 className='text-center text-4xl'>
+          <span className='flex justify-center items-center'>
+            <img className='w-3/5' src={source.logo} alt='Minecraft'/>
+            のこと、
+          </span>
+          <p>ゲームだと思ってない？</p>
+        </h1>
+        <b className='text-center text-lg'>実は、それだけじゃない！</b>
+        <b className='text-center text-lg'>デザイン、プログラムの勉強にも Minecraft は使えます！</b>
+      </Section>
+      <Section fadeIn={1}>
+        <h1>『Minecraft』って？</h1>
+        <Figure site='tips'>
+          Minecraft は、ブロック、モブ、コミュニティで出来ているゲームです。夜を生き抜いたり、芸術作品を作ったり。遊び方はあなた次第です。
+        </Figure>
+        <p>Minecraft はその独特な世界観と自由度の高さから圧倒的な人気を持つゲームです。</p>
+        <p>勿論ですが、<em>Minecraft はゲームとしても立派に楽しむことができます。</em></p>
+        <p>サバイバルモードでは冒険や、採掘、拠点を建てるなど、思うがままに生活することができます。</p>
+      </Section>
+      <Section fadeIn={2}>
+        <h1>始めの一歩</h1>
+        <p>クリエイティブモードでは、あらゆることの制限がなくなります！</p>
+        <p>無尽蔵にある建材で建築を極めたり...</p>
+        <p>レッドストーンで簡単な機能を作ったり...</p>
+        <p>コマンドで摩訶不思議なこともできます！</p>
+        <p>こういったもので Minecraft を理解することは、後々開発する時にも役に立ちます！</p>
+        <p>覚えておいて損はありません！</p>
+      </Section>
+      <Section fadeIn={3}>
+        <h1>作りたい時にやってみよう</h1>
+        <p>Minecraft をやっていると、やってみたくても実現できなかったことがあると思います。</p>
+        <p><em>諦めるにはまだ早いです！</em></p>
+        <p>ResroucePack、DataPack、Plugin、Modなど...</p>
+        <p>Minecraft には実現できる方法が沢山あります！</p>
+        <p>要求されるレベルは上がっていきますが、確実にどんなことでも出来るようになります！</p>
+        <p>このサイトでは、そんな道への第一歩を、サポートできればと思います！</p>
+      </Section>
+      <footer style={{ height: '20vh' }} className='flex flex-col items-center p-4 border-t-2 text-sm text-gray-400 border-t-green-800 bg-green-950'>
+        <p>このサイトは<Anchor site='guide'/>に沿って作成されています。</p>
+        <p>Minecraft の公式のサイトではありません。Mojang または Microsoft から承認を受けておらず、それとの関連性もありません。</p>
+        <p>お問い合わせは@<Anchor site='slack'/>まで</p>
       </footer>
-    </>
+    </Scroll>
+  )
+}
+
+function Section(props: JSX.IntrinsicElements['div'] & ({ ishead: true } | { fadeIn: number })) {
+  const scroll = useScroll(), [opacity, setOpacity] = useState(1)
+
+  if ('fadeIn' in props) {
+    useFrame(() => setOpacity(scroll.range(0.15 * props.fadeIn - 0.03, 0.15 * props.fadeIn + 0.05)))
+  }
+
+  return (
+    <section style={{opacity: opacity}} className={`flex flex-col justify-center h-screen mx-5 xl:mx-52 ${props.className}`}>
+      <div {...props} className={`flex flex-col justify-center p-4 ${'ishead' in props ? '' : 'bg-green-900/50'}`} />
+    </section>
+  )
+}
+
+function Figure(props: PropsWithChildren<{ site: keyof typeof sites }>) {
+  return (
+    <figure className='mx-10'>
+      <blockquote cite={sites[props.site].cite} children={props.children} className='p-4 bg-green-950' />
+      <figcaption className='p-4 italic text-right'>
+        <cite>ー <Anchor site={props.site}/></cite>より引用
+      </figcaption>
+    </figure>
+  )
+}
+
+const sites = {
+  tips: { href: 'https://www.minecraft.net/minecraft-tips-for-beginners#before_you_begin', cite: 'Minecraft 初心者向けヒント' },
+  guide: { href: 'https://www.minecraft.net/usage-guidelines', cite: 'Minecraft 利用ガイドライン' },
+  slack: { href: 'https://n-highschool.slack.com/team/U01TQ4M0L1L', cite: 'Unreadabread' },
+} as const
+
+function Anchor({site}: {site: keyof typeof sites}) {
+  return (
+    <a tabIndex={-1} href={sites[site].href} target='_blank' rel='noopener noreferrer'>{sites[site].cite}</a>
+  )
+}
+
+function BuildingDiorite<R extends [number, number, number?], V extends [R, R, R]>(props: {range: R, position: V, rotation: [R, R, R]}) {
+  const ref = useRef<Object3D>(null), scroll = useScroll()
+  useFrame(() => {
+    if (!ref.current) return
+    const range = scroll.range(props.range[0], props.range[1], props.range[2]), {position, rotation} = ref.current
+    position.set(...mapVector(props.position, range))
+    rotation.set(...mapVector(props.rotation, range))
+  })
+  return (
+    <Suspense fallback="だめぽ">
+      <Gltf src={source.diorite} ref={ref}/>
+    </Suspense>
+  )
+}
+
+function mapVector<R extends [number, number, number?]>(vector: [R, R, R], value: number) {
+  return vector.map(([total, domain, ever = 0]) => total - domain * value + ever) as [number, number, number]
+}
+
+function Fire() {
+  const [intensity, setIntensity] = useState(10)
+
+  useFrame(({clock}) => {
+    setIntensity(15 + (Math.cos(clock.elapsedTime) * 2 - 1) * 2)
+  })
+
+  return (
+    <pointLight color='#d74d06' intensity={intensity} position={[-4, -18, 10]} />
   )
 }
